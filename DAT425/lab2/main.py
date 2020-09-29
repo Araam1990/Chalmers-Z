@@ -1,3 +1,4 @@
+import sys
 # Imports everything from both model and graphics
 from gamemodel import *
 from gamegraphics import *
@@ -13,13 +14,47 @@ def graphicFire(game, angle, vel):
         update(50)
     return gproj
 
+
+# This was basically copied from textmain
+def finishShot(game, proj):
+    # The current player
+    player = game.getCurrentPlayer()
+    # The player opposing the current player
+    other = game.getOtherPlayer()
+
+    # Check if we won
+    distance = other.projectileDistance(proj) 
+    if distance == 0.0:
+        print('Direct hit! ' + player.getColor() + ' player wins the round!')
+        player.increaseScore()
+        print('the current score is '+player.getColor()+':'+str(player.getScore())+', '+other.getColor()+':'+str(other.getScore()))
+        # Start a new round
+        game.newRound()
+    else:
+        print('missed by a distance of {0:.1f}'.format(distance))
+
+    # Switch active player
+    game.nextPlayer()
+    
+
 def graphicPlay():
-    # TODO: This is where you implement the game loop
-    # HINT: Creating a GraphicGame is a good start. 
-    # HINT: You can look at the text interface for some inspiration
-    # Note that this code should not directly work with any drawing or such, all that is done by the methods in the classes
-    pass
+    game = GraphicGame( Game(10, 3))
 
+    game.newRound()
 
-# Run the game with graphical interface
+    while True:
+        player = game.getCurrentPlayer()
+
+        angle, velo = player.getAim()
+
+        dialog = InputDialog(angle, velo, game.getCurrentWind())
+        if not dialog.interact() == "Fire!":
+            sys.exit(0)
+
+        angle, vel = dialog.getValues()
+        dialog.close()
+
+        proj = graphicFire(game, angle, vel)
+        finishShot(game, proj)
+
 graphicPlay()

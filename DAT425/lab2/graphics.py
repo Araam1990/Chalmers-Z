@@ -579,6 +579,8 @@ class _BBox(GraphicsObject):
     
     def __init__(self, p1, p2, options=["outline","width","fill"]):
         GraphicsObject.__init__(self, options)
+
+        #print(p1, p2)
         self.p1 = p1.clone()
         self.p2 = p2.clone()
 

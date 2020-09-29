@@ -11,33 +11,88 @@
 #------------------------------------------------------
 
 
-
 # This is the only place where graphics should be imported!
 from graphics import *
 
-# TODO: There needs to be a class called GraphicGame here. 
-# Its constructor should take only a Game object.
-# TODO: In addition to the methods of Game, GraphicGame needs to have a getWindow method that returns the main GraphWin object the game is played in
-# HINT: Look at the other classes in this file, the GraphicGame class should "wrap around" a Game object the same way GraphicPlayer wraps around a Player
-# HINT: These lines are good for creating a window:
-#  win = GraphWin("Cannon game" , 640, 480, autoflush=False)
-#  win.setCoords(-110, -10, 110, 155)
-# HINT: Don't forget to call draw() on every component you create, otherwise they will not be visible
-# HINT: You need to get the Players from the Game object (the model), wrap them into GraphicPlayers and store them, and all get-methods for players (e.g. getCurrentPlayer) must return the Graphical versions
+class GraphicGame:
+    def __init__(self, game):
+        self.game = game
+
+        self.win = GraphWin("Cannon game" , 640, 480, autoflush=False)
+        self.win.setCoords(-110, -10, 110, 155)
+
+        line = Line(Point(-110, 0), Point(110, 0))
+        line.draw(self.win)
+
+        self.graphicalPlayers = list(map(lambda x: GraphicPlayer(x, self.win), self.game.getPlayers()))
+
+    def getPlayers(self):
+        return self.graphicalPlayers
+
+    def getCurrentPlayer(self):
+        return self.graphicalPlayers[self.getCurrentPlayerNumber()]
+
+    def getOtherPlayer(self):
+        otherPlayer = 1 if self.getCurrentPlayerNumber() == 0 else 0
+        return self.graphicalPlayers[otherPlayer]
+
+    def getCurrentPlayerNumber(self):
+        return self.game.getCurrentPlayerNumber()
+
+    def getCannonSize(self):
+        return self.game.getCannonSize()
+
+    def getBallSize(self):
+        return self.game.getBallSize()
+
+    def getCurrentWind(self):
+        return self.game.getCurrentWind()
+
+    def setCurrentWind(self, wind):
+        self.game.setCurrentWind(wind)
+
+    def nextPlayer(self):
+        self.game.nextPlayer()
+
+    def newRound(self):
+        self.game.newRound()
+
+    def getWindow(self):
+        return self.win
+
+    
 
 class GraphicPlayer:
-    # TODO: We need a constructor here! The constructor needs to take a Player object as parameter and store it in self.player for the methods below to work.
-    # HINT: The constructor should create and draw the graphical elements of the player (score and cannon)
-    # HINT: The constructor probably needs a few additional parameters e.g. to access the game window.
-    
+
+    def __init__(self, player, win):
+        self.player = player
+
+        self.win = win
+
+        self.proj = None
+
+        self.scoreText = Text(Point(self.player.xPos, -5), "Score: 0")
+
+        self.scoreText.draw(win)
+
+        game = self.player.game
+
+        cannonGraphic = Rectangle( 
+            Point( self.player.getX()-game.cannonSize/2, 0), 
+            Point( self.player.getX()+game.cannonSize/2, game.cannonSize)
+        )
+        cannonGraphic.setFill(self.player.getColor())
+        cannonGraphic.draw(win)
+
     def fire(self, angle, vel):
-        # Fire the cannon of the underlying player object
         proj = self.player.fire(angle, vel)
+
+        if self.proj:
+            self.proj.undraw()
         
-        #TODO: We need to undraw the old GraphicProjectile for this player (if there is one).
-        
-        # TODO: proj is a Projectile, but we should return a GraphicProjectile here! We need to create a GraphicProjectile "wrapping" around proj.
-        return proj
+        self.proj = GraphicProjectile(proj, self)
+        return self.proj
+
     
     def getAim(self):
         return self.player.getAim()
@@ -56,20 +111,34 @@ class GraphicPlayer:
         
     def increaseScore(self):
         self.player.increaseScore()
-        # TODO: This seems like a good place to update the score text.
+        self.scoreText.setText( "Score: %s" % self.player.getScore())
 
 
 """ A graphic wrapper around the Projectile class (adapted from ShotTracker in book)"""
 class GraphicProjectile:
-    # TODO: This one also needs a constructor, and it should take a Projectile object as parameter and store it in self.proj.
-    # Hint: We are also going to need access to the game window
-    # Hint: There is no color attribute in the Projectile class, either it needs to be passed to the constructor here or Projectile needs to be modified.
+    def __init__(self, proj, graphicPlayer):
+        self.proj = proj
+
+        game = graphicPlayer.player.game
+        
+        ballSize = game.getBallSize()
+
+        self.drawing = Circle( Point(self.proj.getX(), self.proj.getY()), ballSize/2)
+        self.drawing.setFill(graphicPlayer.getColor())
+
+        self.drawing.draw(graphicPlayer.win)
 
     def update(self, dt):
         # update the projectile
+
+        beforeX, beforeY = self.proj.getX(), self.proj.getY()
+
         self.proj.update(dt)
-        # TODO: Graphic stuff needs to happen here.
-        
+
+        afterX, afterY = self.proj.getX(), self.proj.getY()
+
+        self.drawing.move(afterX - beforeX, afterY - beforeY)
+
     def getX(self):
         return self.proj.getX()
 
@@ -79,9 +148,8 @@ class GraphicProjectile:
     def isMoving(self):
         return self.proj.isMoving()
 
-    # TODO: There needs to be a way of undrawing the projectile.
-    # HINT: All graphical components in graphics.py have undraw()-methods    
-
+    def undraw(self):
+        self.drawing.undraw()
 
 """ A somewhat specific input dialog class (adapted from the book) """
 class InputDialog:
