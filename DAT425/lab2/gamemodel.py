@@ -1,7 +1,6 @@
 from math import sin,cos,radians
 import random
 
-#TODO: Deal with all TODOs in this file and also remove the TODO and HINT comments.
 
 """ This is the model of the game"""
 class Game:
@@ -18,9 +17,6 @@ class Game:
         self.currentPlayerNumber = 0
 
         self.wind = 0
-
-        # TODO: "pass" means the constructor does nothing. Clearly it should be doing something.
-        # HINT: This constructor needs to create two players according to the rules specified in the assignment text
 
     """ A list containing both players """
     def getPlayers(self):
