@@ -10,8 +10,8 @@ class Game:
         self.ballSize = ballSize
 
         self.players = [
-            Player(self, "blue", -90, 45),
-            Player(self, "red", 90, 45)
+            Player(self, "blue", -90),
+            Player(self, "red", 90)
         ]
 
         self.currentPlayerNumber = 0
@@ -60,7 +60,7 @@ class Game:
 
 """ Models a player """
 class Player:
-    def __init__(self, game, color, position, direction):
+    def __init__(self, game, color, position):
         self.game = game
 
         self.proj = None
@@ -68,9 +68,8 @@ class Player:
         self.xPos = position
         self.color = color
 
-        self.lastAngle = direction
+        self.lastAngle = 45
         self.lastVelocity = 40
-
 
     """ Create and return a projectile starting at the centre of this players cannon. Replaces any previous projectile for this player. """
     def fire(self, angle, velocity):
