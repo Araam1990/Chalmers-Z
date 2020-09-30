@@ -60,7 +60,7 @@ class Game:
 
 """ Models a player """
 class Player:
-    def __init__(self, game, color, position, direction):f
+    def __init__(self, game, color, position, direction):
         self.game = game
 
         self.proj = None
@@ -88,7 +88,6 @@ class Player:
 
     """ Gives the x-distance from this players cannon to a projectile. If the cannon and the projectile touch (assuming the projectile is on the ground and factoring in both cannon and projectile size) this method should return 0"""
     def projectileDistance(self, proj):
-
         #Absolute distance
         distance = abs(proj.getX() - self.getX())
     
