@@ -1,6 +1,6 @@
-# Code for Z programming courses
+# Code for Z's programming courses
 
-Here you can find finished code for most of Z's programming courses
+Here you can find finished code for most of Z's (Automation & Mechatronics) programming courses
 
 
 * [DAT425 - Introductory course in programming](DAT425)
